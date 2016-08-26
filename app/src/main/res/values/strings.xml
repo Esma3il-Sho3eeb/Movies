@@ -66,5 +66,7 @@
     <string name="pref_title_down_wifi">Download over wifi only</string>
     <string name="pref_key_over_wifi">wifi</string>
     <string name="pref_down_summary">un check only when urgent</string>
+    <string name="internet_available">Internet is available</string>
+    <string name="internet_not_available">Internet is not available</string>
 
 </resources>
