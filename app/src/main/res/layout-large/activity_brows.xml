@@ -17,21 +17,18 @@
         android:baselineAligned="false"
         android:orientation="horizontal">
 
-        <fragment
-            android:id="@+id/fragment_brows"
-            android:name="com.ecsm.android.movie.ui.FragmentBrows"
-            android:layout_width="0px"
+        <FrameLayout
+            android:id="@+id/container_fragment_brows"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            tools:layout="@layout/fragment_brows"/>
+            android:layout_weight="1"/>
 
-        <fragment
-            android:id="@+id/fragment_details"
-            android:name="com.ecsm.android.movie.ui.FragmentDetails"
-            android:layout_width="0px"
+        <FrameLayout
+            android:id="@+id/container_fragment_details"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            tools:layout="@layout/fragment_details"/>
+            android:layout_weight="1"/>
+
 
     </LinearLayout>
 
