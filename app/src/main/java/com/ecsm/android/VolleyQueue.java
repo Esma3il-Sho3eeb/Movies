@@ -25,7 +25,7 @@ public class VolleyQueue {
         return mInstance;
     }
 
-    public RequestQueue getRequestQueue() {
+    public synchronized  RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
         }
