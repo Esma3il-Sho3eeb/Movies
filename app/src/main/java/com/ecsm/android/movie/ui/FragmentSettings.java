@@ -16,7 +16,7 @@ public class FragmentSettings extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        ActivityBrows.refreshStatus=true;
+        ActivityBrows.setRefreshStatus(true);
 
     }
 }

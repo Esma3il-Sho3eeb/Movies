@@ -1,16 +1,28 @@
 package com.ecsm.android.movie.ui;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v7.app.AppCompatActivity;
+import android.preference.PreferenceActivity;
+
+import com.ecsm.android.movie.R;
+
+import java.util.List;
 
 
-public class activitySettings extends AppCompatActivity {
+public class ActivitySettings extends PreferenceActivity {
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new FragmentSettings())
-                .commit();
+
+
+    }
+
+    @Override
+    public void onBuildHeaders(List<PreferenceActivity.Header> target) {
+        loadHeadersFromResource(R.xml.headers, target);
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return FragmentSettings.class.getName().equals(fragmentName);
     }
 }

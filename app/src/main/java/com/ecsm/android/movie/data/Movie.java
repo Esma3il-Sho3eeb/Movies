@@ -3,6 +3,7 @@ package com.ecsm.android.movie.data;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.ecsm.android.movie.Url;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -11,15 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "movie")
-public class Movie extends Model implements Serializable{
-    public static final String KEY_EXTRA="movie_by";
+public class Movie extends Model implements Serializable {
+    public static final String KEY_EXTRA = "movie_by";
 
-    @Column
+    @Column(name = "adult")
     @SerializedName("adult")
     @Expose
     private Boolean adult;
 
-    @Column
+    @Column(name = "backdrop_path")
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -29,7 +30,7 @@ public class Movie extends Model implements Serializable{
     @Expose
     private Object belongsToCollection;
 
-    @Column
+    @Column(name = "budget")
     @SerializedName("budget")
     @Expose
     private Integer budget;
@@ -38,42 +39,42 @@ public class Movie extends Model implements Serializable{
     @Expose
     private List<Genre> genres = new ArrayList<>();
 
-    @Column
+    @Column(name = "homepage")
     @SerializedName("homepage")
     @Expose
     private String homepage;
 
-    @Column(unique = true, notNull = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name ="movieId" ,unique = true, notNull = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     @SerializedName("id")
     @Expose
     private Integer movieId;
 
-    @Column
+    @Column(name = "imdb_id")
     @SerializedName("imdb_id")
     @Expose
     private String imdbId;
 
-    @Column
+    @Column(name = "original_language")
     @SerializedName("original_language")
     @Expose
     private String originalLanguage;
 
-    @Column
+    @Column(name = "original_title")
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
 
-    @Column
+    @Column(name = "overview")
     @SerializedName("overview")
     @Expose
     private String overview;
 
-    @Column
+    @Column(name = "popularity")
     @SerializedName("popularity")
     @Expose
     private Double popularity;
 
-    @Column
+    @Column(name = "poster_path")
     @SerializedName("poster_path")
     @Expose
     private String posterPath;
@@ -86,17 +87,17 @@ public class Movie extends Model implements Serializable{
     @Expose
     private List<ProductionCountry> productionCountries = new ArrayList<>();
 
-    @Column
+    @Column(name = "release_date")
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
 
-    @Column
+    @Column(name = "revenue")
     @SerializedName("revenue")
     @Expose
     private Integer revenue;
 
-    @Column
+    @Column(name="runtime")
     @SerializedName("runtime")
     @Expose
     private Integer runtime;
@@ -105,35 +106,70 @@ public class Movie extends Model implements Serializable{
     @Expose
     private List<SpokenLanguage> spokenLanguages = new ArrayList<>();
 
-    @Column
+    @Column(name="status")
     @SerializedName("status")
     @Expose
     private String status;
 
-    @Column
+    @Column(name = "tagline")
     @SerializedName("tagline")
     @Expose
     private String tagline;
 
-    @Column
+    @Column(name = "title")
     @SerializedName("title")
     @Expose
     private String title;
 
-    @Column
-    @SerializedName("video")
-    @Expose
-    private Boolean video;
 
-    @Column
+
+    @Column(name = "vote_average")
     @SerializedName("vote_average")
     @Expose
     private Double voteAverage;
 
-    @Column
+    @Column(name = "vote_count")
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+
+    public int getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(int isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+
+    @Column(name = "markedFavorite")
+    private int isFavorite=0;
+
+    public static String getMovieDetailsUrl(Movie movie) {
+        return Url.Base.API + "/movie/" + movie.getMovieId() + Url.API_KEY;
+    }
+
+    public static String getMovieReviewsUrl(Movie movie) {
+        return Url.Base.API + "/movie/" + movie.getMovieId() + "/review" + Url.API_KEY;
+    }
+
+    public static String getMovieTrailsUrl(Movie movie) {
+        return Url.Base.API + "/movie/" + movie.getMovieId() + "/videos" + Url.API_KEY;
+    }
+
+    public String getMovieDetailsUrl() {
+        return Url.Base.API + "/movie/" + movieId + Url.API_KEY;
+    }
+
+    public String getMovieReviewsUrl() {
+        return Url.Base.API + "/movie/" + movieId + "/reviews" + Url.API_KEY;
+    }
+    public String getMovieReviewsUrl(int page) {
+        return Url.Base.API + "/movie/" + movieId + "/reviews" + Url.API_KEY+"&page="+page;
+    }
+
+    public String getMovieTrailsUrl() {
+        return Url.Base.API + "/movie/" + movieId + "/videos" + Url.API_KEY;
+    }
 
     /**
      * @return The adult
@@ -443,19 +479,7 @@ public class Movie extends Model implements Serializable{
         this.title = title;
     }
 
-    /**
-     * @return The video
-     */
-    public Boolean getVideo() {
-        return video;
-    }
 
-    /**
-     * @param video The video
-     */
-    public void setVideo(Boolean video) {
-        this.video = video;
-    }
 
     /**
      * @return The voteAverage

@@ -6,27 +6,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ecsm.android.movie.R;
-import com.ecsm.android.movie.Url;
-import com.ecsm.android.movie.data.Movie;
-import com.squareup.picasso.Picasso;
+import com.ecsm.android.movie.data.Review;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Holder> {
-    private List<Movie> mData;
-    private MovieListener mListener;
+public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.Holder> {
+    private List<Review> mData;
+    private ReviewListener mListener;
     private ReachEndListener mEndListener;
 
 
-    public RecycleAdapter(List<Movie> data) {
-        mListener = new MovieListener() {
+    public ReviewsAdapter(List<Review> data) {
+        mListener = new ReviewListener() {
             @Override
-            public void onClick(Movie movie) {
+            public void onClick(Review review) {
 
             }
         };
@@ -43,21 +41,20 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Holder> 
         }
     }
 
-    public RecycleAdapter() {
+    public ReviewsAdapter() {
         this(null);
     }
 
     public void removeAll() {
-      //  int previousPosition = mData.size() - 1;
         mData.clear();
         notifyDataSetChanged();
     }
 
-    public void setOnItemClickListener(MovieListener listener) {
+    public void setOnItemClickListener(@Nullable ReviewListener listener) {
         if (listener == null)
-            mListener = new MovieListener() {
+            mListener = new ReviewListener() {
                 @Override
-                public void onClick(Movie movie) {
+                public void onClick(Review movie) {
 
                 }
             };
@@ -78,7 +75,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Holder> 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_review, parent, false);
         return new Holder(v);
     }
 
@@ -94,20 +91,20 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Holder> 
         return mData.size();
     }
 
-    public void add(Movie movie) {
-        mData.add(movie);
+    public void add(Review review) {
+        mData.add(review);
         notifyItemInserted(mData.size() - 1);
     }
 
-    public void addAll(Collection<Movie> movies) {
+    public void addAll(Collection<Review> reviews) {
         int previousSize = mData.size();
-        mData.addAll(movies);
-        notifyItemRangeInserted(previousSize, movies.size() - 1);
+        mData.addAll(reviews);
+        notifyItemRangeInserted(previousSize, reviews.size() - 1);
 
     }
 
-    public interface MovieListener {
-        void onClick(Movie movie);
+    public interface ReviewListener {
+        void onClick(Review review);
     }
 
     public interface ReachEndListener {
@@ -115,21 +112,29 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Holder> 
     }
 
     class Holder extends RecyclerView.ViewHolder {
-        private ImageView poster;
+        private TextView authorName, reviewContent;
 
 
         public Holder(View itemView) {
             super(itemView);
-            poster = (ImageView) itemView.findViewById(R.id.image_icon);
+            authorName = (TextView) itemView.findViewById(R.id.reviewAuthorName);
+            reviewContent = (TextView) itemView.findViewById(R.id.reviewContent);
+
         }
 
-        public void setup(final Movie movie, final MovieListener listener) {
-
-            Picasso.with(poster.getContext()).load(Url.Base.IMAGE + movie.getPosterPath() + Url.API_KEY).into(poster);
-            poster.setOnClickListener(new View.OnClickListener() {
+        public void setup(final Review review, final ReviewListener listener) {
+            authorName.setText(review.getAuthor());
+            reviewContent.setText(review.getContent());
+            reviewContent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onClick(movie);
+                    listener.onClick(review);
+                }
+            });
+            authorName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onClick(review);
                 }
             });
         }

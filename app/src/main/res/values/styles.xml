@@ -9,6 +9,7 @@
         <item name="android:textColorPrimary">@color/colorPrimaryText</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+
     </style>
 
 </resources>
