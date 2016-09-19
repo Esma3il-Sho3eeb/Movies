@@ -27,7 +27,6 @@ import com.ecsm.android.movie.R;
 import com.ecsm.android.movie.Url;
 import com.ecsm.android.movie.adapter.ReviewsAdapter;
 import com.ecsm.android.movie.adapter.TrailersAdapter;
-import com.ecsm.android.movie.data.Favorite;
 import com.ecsm.android.movie.data.Movie;
 import com.ecsm.android.movie.data.Review;
 import com.ecsm.android.movie.data.ReviewsContainer;
@@ -46,7 +45,6 @@ public class FragmentDetails extends Fragment {
     private TextView movieTitle, releaseDate, duration, rating, overview;
     private Button actionFavorite;
     private Movie mMovie;
-    private Favorite mFavorite;
     private int currentPage = 1, pagesNumber = 0;
 
     @Nullable
@@ -107,8 +105,12 @@ public class FragmentDetails extends Fragment {
         });
         trailersView.setAdapter(mTrailersAdapter);
 
-
-        mMovie = (Movie) getArguments().getSerializable(Movie.KEY_EXTRA);
+        if (getArguments() != null)
+            mMovie = (Movie) getArguments().getSerializable(Movie.KEY_EXTRA);
+        if(savedInstanceState!=null){
+            if(savedInstanceState.getSerializable(Movie.KEY_EXTRA)!=null)
+                mMovie= (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
+        }
         if (mMovie != null) onReceive(mMovie);
         actionFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,6 +187,13 @@ public class FragmentDetails extends Fragment {
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getActivity().getSupportFragmentManager().putFragment(outState,TAG,this);
+    }
+
     private void getMovieTrailers() {
         StringRequest request;
 
@@ -239,7 +248,7 @@ public class FragmentDetails extends Fragment {
                 return;
 
             StringRequest request;
-
+mReviewsAdapter.removeAll();
             request = new StringRequest(mMovie.getMovieReviewsUrl(currentPage + 1), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -284,4 +293,6 @@ public class FragmentDetails extends Fragment {
         VolleyQueue.getInstance(getActivity().getApplicationContext()).addToRequestQueue(request);
 
     }
+
+
 }

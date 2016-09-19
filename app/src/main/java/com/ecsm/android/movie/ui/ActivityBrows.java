@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -33,7 +34,8 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
     private boolean is_status_text_in_layout = false;
     private NetworkReceiver mNetworkReceiver;
     private TextView mStatusText;
-    private FragmentDetails mFragmentDetails;
+    private FragmentBrows mFragmentBrows = new FragmentBrows();
+    private FragmentDetails mFragmentDetails = new FragmentDetails();
     private Toolbar mToolbar;
 
     public static boolean isAvailable() {
@@ -60,6 +62,7 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         setContentView(R.layout.activity_brows);
         setUp();
         ///
+
 
         PrimaryDrawerItem item1 = new PrimaryDrawerItem()
                 .withIdentifier(1).withName(R.string.action_brows).withSelectable(false);
@@ -139,21 +142,16 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
         ///
 
-
-        if (savedInstanceState == null) {
-            FragmentBrows fragmentBrows = new FragmentBrows();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_fragment_brows, fragmentBrows).commit();
-
-            if (findViewById(R.id.container_fragment_details) != null) {
-                mFragmentDetails = new FragmentDetails();
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container_fragment_details, mFragmentDetails).commit();
-
-            }
-
-
+        if (savedInstanceState != null) {
+    mFragmentDetails= (FragmentDetails)
+            getSupportFragmentManager()
+                    .getFragment(savedInstanceState,FragmentDetails.TAG);
+            mFragmentBrows= (FragmentBrows)
+                    getSupportFragmentManager()
+                            .getFragment(savedInstanceState,FragmentBrows.TAG);
         }
+
+
     }
 
     private void setUp() {
@@ -187,8 +185,29 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
     @Override
     protected void onResume() {
         super.onResume();
-        setTitle(R.string.app_name);
 
+        setTitle(R.string.app_name);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container_fragment_brows, new FragmentBrows())
+                .commit();
+
+        if (findViewById(R.id.container_fragment_details) != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_fragment_details, mFragmentDetails)
+                    .commit();
+
+        }
+
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        getSupportFragmentManager().putFragment(outState, FragmentDetails.TAG, mFragmentDetails);
+        getSupportFragmentManager().putFragment(outState, FragmentBrows.TAG, mFragmentBrows);
     }
 
     @Override
@@ -198,6 +217,7 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
             this.unregisterReceiver(mNetworkReceiver);
         }
     }
+
 
     private void checkConnection() {
         boolean wifi, mobileData;
@@ -271,15 +291,15 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
     @Override
     public void onCall(Movie movie) {
-        if (mFragmentDetails != null) {
+        if (findViewById(R.id.container_fragment_details) != null) {
             mFragmentDetails.onReceive(movie);
         } else {
-            FragmentDetails fragmentDetails = new FragmentDetails();
+            mFragmentDetails = new FragmentDetails();
             Bundle bundle = new Bundle();
             bundle.putSerializable(Movie.KEY_EXTRA, movie);
-            fragmentDetails.setArguments(bundle);
+            mFragmentDetails.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_fragment_brows, fragmentDetails).addToBackStack(null).commit();
+                    .replace(R.id.container_fragment_brows, mFragmentDetails).addToBackStack(null).commit();
 
         }
 
