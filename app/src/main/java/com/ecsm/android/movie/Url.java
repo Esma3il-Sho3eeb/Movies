@@ -2,7 +2,7 @@ package com.ecsm.android.movie;
 
 
 public final class Url {
-    public static final String API_KEY = "?api_key=9490ec35a6eea2efe32378982073f7a3";
+    public static final String API_KEY = "?api_key="+BuildConfig.MOVIE_API_KEY;
 
     public static final class YoutubeThumbnail {
         public static final String BASE = "http://img.youtube.com/vi/";

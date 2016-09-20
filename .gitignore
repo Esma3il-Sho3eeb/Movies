@@ -76,4 +76,5 @@ target/
 .idea
 *.iml
 build
-
+/gradle.properties
+gradle.properties
