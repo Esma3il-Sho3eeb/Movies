@@ -118,7 +118,7 @@ public class FragmentDetails extends Fragment {
             @Override
             public void onClick(View view) {
                 Drawable image;
-                mRegisterChanges.onMovieStatusChange();
+
                 if (mMovie.getIsFavorite() > 0) {
                     mMovie.setIsFavorite(0);
                     image = ContextCompat.getDrawable(
@@ -138,6 +138,7 @@ public class FragmentDetails extends Fragment {
                 actionFavorite.setCompoundDrawables(image, null, null, null);
 
                 mMovie.save();
+                mRegisterChanges.onMovieStatusChange();
             }
         });
         return v;

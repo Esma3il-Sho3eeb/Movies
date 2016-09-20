@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -31,13 +30,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 public class ActivityBrows extends AppCompatActivity implements FragmentBrows.CallBack, FragmentDetails.RegisterChanges {
     private static boolean available = false, prefWifi = true;
     private static boolean refreshStatus = true;
+    boolean favoriteOn = false;
     private boolean is_status_text_in_layout = false;
     private NetworkReceiver mNetworkReceiver;
     private TextView mStatusText;
     private FragmentDetails mFragmentDetails = new FragmentDetails();
     private Toolbar mToolbar;
     private Movie lastMovie;
-    private Fragment lastFragment = new FragmentBrows();
+    private FragmentFavorite mFragmentFavorite;
 
     public static boolean isAvailable() {
         return available;
@@ -94,16 +94,14 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                 drawer.closeDrawer();
                 FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction transaction;
 
+                FragmentTransaction transaction;
                 switch ((int) drawerItem.getIdentifier()) {
                     case 1:
                         //brows
 
-                        FragmentBrows brows = (FragmentBrows) fm.findFragmentByTag(FragmentBrows.TAG);
-                        if (brows == null) {
-                            brows = new FragmentBrows();
-                        }
+                        FragmentBrows brows = new FragmentBrows();
+
                         transaction = fm.beginTransaction();
                         transaction.replace(R.id.container_fragment_brows, brows);
                         transaction.commit();
@@ -112,12 +110,11 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
                         return true;
                     case 2:
                         //favorite
-                        FragmentFavorite favorite = (FragmentFavorite) fm.findFragmentByTag(FragmentBrows.TAG);
-                        if (favorite == null) {
-                            favorite = new FragmentFavorite();
-                        }
+                        mFragmentFavorite = new FragmentFavorite();
+
                         transaction = fm.beginTransaction();
-                        transaction.replace(R.id.container_fragment_brows, favorite);
+                        transaction.replace(R.id.container_fragment_brows, mFragmentFavorite)
+                                .addToBackStack(FragmentFavorite.TAG);
                         transaction.commit();
 
 
@@ -147,7 +144,6 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
 
     }
-
 
 
     private void setUp() {
@@ -195,7 +191,6 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         }
 
     }
-
 
 
     @Override
@@ -305,7 +300,9 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
     @Override
     public void onMovieStatusChange() {
-
+        if (favoriteOn) {
+            mFragmentFavorite.getData();
+        }
     }
 
 

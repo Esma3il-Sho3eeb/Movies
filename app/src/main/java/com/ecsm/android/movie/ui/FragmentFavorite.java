@@ -31,7 +31,7 @@ public class FragmentFavorite extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_brows, container, false);
 
-
+        ((ActivityBrows)getActivity()).favoriteOn=true;
         //start coding
         mCallBack = (FragmentBrows.CallBack) getActivity();
 
@@ -61,8 +61,14 @@ public class FragmentFavorite extends Fragment {
         return v;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((ActivityBrows)getActivity()).favoriteOn=false;
+    }
 
-    private void getData() {
+    public void getData() {
+        adapter.removeAll();
         List<Movie> movies = new Select().from(Movie.class).where("markedFavorite > 0").execute();
         adapter.addAll(movies);
     }
