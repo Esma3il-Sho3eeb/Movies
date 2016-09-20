@@ -37,6 +37,11 @@ public class FragmentFavorite extends Fragment {
 
 
         if (savedInstanceState == null) {
+
+
+            ((ActivityBrows)getActivity()).setActivityTitle(getString(R.string.fragment_favorite_title));
+
+
             RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
 
             GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.list_column_number));

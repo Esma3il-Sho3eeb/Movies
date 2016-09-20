@@ -9,8 +9,8 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -28,15 +28,16 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-public class ActivityBrows extends AppCompatActivity implements FragmentBrows.CallBack {
+public class ActivityBrows extends AppCompatActivity implements FragmentBrows.CallBack, FragmentDetails.RegisterChanges {
     private static boolean available = false, prefWifi = true;
     private static boolean refreshStatus = true;
     private boolean is_status_text_in_layout = false;
     private NetworkReceiver mNetworkReceiver;
     private TextView mStatusText;
-    private FragmentBrows mFragmentBrows = new FragmentBrows();
     private FragmentDetails mFragmentDetails = new FragmentDetails();
     private Toolbar mToolbar;
+    private Movie lastMovie;
+    private Fragment lastFragment = new FragmentBrows();
 
     public static boolean isAvailable() {
         return available;
@@ -65,10 +66,10 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
 
         PrimaryDrawerItem item1 = new PrimaryDrawerItem()
-                .withIdentifier(1).withName(R.string.action_brows).withSelectable(false);
+                .withIdentifier(1).withName(R.string.action_brows).withSelectable(true);
 
         PrimaryDrawerItem item2 = new PrimaryDrawerItem()
-                .withIdentifier(2).withName(R.string.action_favorite).withSelectable(false);
+                .withIdentifier(2).withName(R.string.action_favorite).withSelectable(true);
 
         PrimaryDrawerItem item3 = new PrimaryDrawerItem()
                 .withIdentifier(4).withName(R.string.action_settings).withSelectable(false);
@@ -142,17 +143,12 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
         ///
 
-        if (savedInstanceState != null) {
-    mFragmentDetails= (FragmentDetails)
-            getSupportFragmentManager()
-                    .getFragment(savedInstanceState,FragmentDetails.TAG);
-            mFragmentBrows= (FragmentBrows)
-                    getSupportFragmentManager()
-                            .getFragment(savedInstanceState,FragmentBrows.TAG);
-        }
+        mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
 
 
     }
+
+
 
     private void setUp() {
         mStatusText = new TextView(this);
@@ -191,24 +187,16 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
                 .beginTransaction()
                 .replace(R.id.container_fragment_brows, new FragmentBrows())
                 .commit();
+        mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
 
-        if (findViewById(R.id.container_fragment_details) != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container_fragment_details, mFragmentDetails)
-                    .commit();
-
+        if (mFragmentDetails != null) {
+            if (lastMovie != null)
+                mFragmentDetails.onReceive(lastMovie);
         }
 
-
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        getSupportFragmentManager().putFragment(outState, FragmentDetails.TAG, mFragmentDetails);
-        getSupportFragmentManager().putFragment(outState, FragmentBrows.TAG, mFragmentBrows);
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -281,11 +269,15 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         }
     }
 
-    public void setTitle(String title) {
+    public void setActivityTitle(String title) {
         mToolbar.setTitle(title);
     }
 
-    public void setTitle(int resId) {
+    public String getActivityTitle() {
+        return mToolbar.getTitle().toString();
+    }
+
+    public void setActivityTitle(int resId) {
         mToolbar.setTitle(resId);
     }
 
@@ -303,6 +295,16 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
         }
 
+
+    }
+
+    @Override
+    public void onMovieChange(Movie movie) {
+        lastMovie = movie;
+    }
+
+    @Override
+    public void onMovieStatusChange() {
 
     }
 

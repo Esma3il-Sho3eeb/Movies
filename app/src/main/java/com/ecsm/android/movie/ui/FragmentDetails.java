@@ -45,11 +45,13 @@ public class FragmentDetails extends Fragment {
     private TextView movieTitle, releaseDate, duration, rating, overview;
     private Button actionFavorite;
     private Movie mMovie;
+    private RegisterChanges mRegisterChanges;
     private int currentPage = 1, pagesNumber = 0;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mRegisterChanges = (RegisterChanges) getActivity();
         View v = inflater.inflate(R.layout.fragment_details, container, false);
         posterImage = (ImageView) v.findViewById(R.id.detailsPosterImage);
         movieTitle = (TextView) v.findViewById(R.id.detailsMovieTitle);
@@ -107,16 +109,16 @@ public class FragmentDetails extends Fragment {
 
         if (getArguments() != null)
             mMovie = (Movie) getArguments().getSerializable(Movie.KEY_EXTRA);
-        if(savedInstanceState!=null){
-            if(savedInstanceState.getSerializable(Movie.KEY_EXTRA)!=null)
-                mMovie= (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getSerializable(Movie.KEY_EXTRA) != null)
+                mMovie = (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
         }
         if (mMovie != null) onReceive(mMovie);
         actionFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Drawable image;
-
+                mRegisterChanges.onMovieStatusChange();
                 if (mMovie.getIsFavorite() > 0) {
                     mMovie.setIsFavorite(0);
                     image = ContextCompat.getDrawable(
@@ -143,6 +145,8 @@ public class FragmentDetails extends Fragment {
 
     public void onReceive(Movie movie) {
         mMovie = movie;
+        mRegisterChanges.onMovieChange(mMovie);
+
         //
         Movie sd = new Select().from(Movie.class).where("movieId =" + movie.getMovieId()).executeSingle();
         if (sd == null)
@@ -191,7 +195,7 @@ public class FragmentDetails extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        getActivity().getSupportFragmentManager().putFragment(outState,TAG,this);
+        getActivity().getSupportFragmentManager().putFragment(outState, TAG, this);
     }
 
     private void getMovieTrailers() {
@@ -248,7 +252,7 @@ public class FragmentDetails extends Fragment {
                 return;
 
             StringRequest request;
-mReviewsAdapter.removeAll();
+            mReviewsAdapter.removeAll();
             request = new StringRequest(mMovie.getMovieReviewsUrl(currentPage + 1), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -294,5 +298,9 @@ mReviewsAdapter.removeAll();
 
     }
 
+    interface RegisterChanges {
+        void onMovieChange(Movie movie);
 
+        void onMovieStatusChange();
+    }
 }

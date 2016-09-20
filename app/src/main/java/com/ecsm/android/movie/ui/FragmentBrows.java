@@ -37,7 +37,7 @@ public class FragmentBrows extends Fragment {
     private CallBack mCallBack;
     private boolean recast = true;
     private int currentPage;
-    private boolean wasPopular = true;
+    private boolean wasPopular ;
 
     @Nullable
     @Override
@@ -54,29 +54,41 @@ public class FragmentBrows extends Fragment {
                         , Url.Full.Popular
 
                 );
+        String string = getString(R.string.fragment_brows_title);
+
+        if (urlRequest.equals(Url.Full.Popular)) {
+            string=string.concat("(" + getString(R.string.popular) + ")");
+            wasPopular=true;
+        }else {
+           string= string.concat("(" + getString(R.string.top_rated) + ")");
+            wasPopular=false;
+
+        }
 
 
+        ((ActivityBrows) getActivity()).setActivityTitle(string);
 
-            RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
 
-            GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.list_column_number));
-            recyclerView.setLayoutManager(layoutManager);
-            adapter = new RecycleAdapter();
-            adapter.setOnItemClickListener(new RecycleAdapter.MovieListener() {
-                @Override
-                public void onClick(Movie movie) {
-                    mCallBack.onCall(movie);
-                }
-            });
-            adapter.setOnReachEndListener(new RecycleAdapter.ReachEndListener() {
-                @Override
-                public void onReachEnd() {
-                    setupRequest(false);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
 
-                }
-            });
-            setupRequest(true);
-            recyclerView.setAdapter(adapter);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.list_column_number));
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new RecycleAdapter();
+        adapter.setOnItemClickListener(new RecycleAdapter.MovieListener() {
+            @Override
+            public void onClick(Movie movie) {
+                mCallBack.onCall(movie);
+            }
+        });
+        adapter.setOnReachEndListener(new RecycleAdapter.ReachEndListener() {
+            @Override
+            public void onReachEnd() {
+                setupRequest(false);
+
+            }
+        });
+        setupRequest(true);
+        recyclerView.setAdapter(adapter);
 
 
         //end coding
@@ -130,7 +142,7 @@ public class FragmentBrows extends Fragment {
     }
 
     private void setupRequest(boolean newRequest) {
-        Thread thread = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -144,13 +156,21 @@ public class FragmentBrows extends Fragment {
             }
         });
 //        if (ActivityBrows.isAvailable()) {
-        if (recast) {
-            recast = false;
-        } else {
-            return;
-        }
+
         StringRequest request;
         if (newRequest) {
+            //
+            String string = getString(R.string.fragment_brows_title)
+                    .concat("(" +
+                            getString(
+                                    (urlRequest.equals(Url.Full.Popular)) ?
+                                            R.string.popular : R.string.top_rated) + ")");
+            ((ActivityBrows) getActivity()).setActivityTitle(string);
+
+
+            //
+
+
             request = new StringRequest(urlRequest, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -159,7 +179,8 @@ public class FragmentBrows extends Fragment {
                     currentPage = d.getPage();
                     adapter.removeAll();
                     adapter.addAll(d.getMovies());
-                    recast = true;
+                    recast = false;
+
 
                 }
             }
@@ -189,7 +210,7 @@ public class FragmentBrows extends Fragment {
             });
         }
         VolleyQueue.getInstance(getActivity().getApplicationContext()).addToRequestQueue(request);
-
+        recast = true;
 
 //        }
 

@@ -23,11 +23,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
-        <FrameLayout
+        <fragment
             android:id="@+id/container_fragment_details"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:name="com.ecsm.android.movie.ui.FragmentDetails"
+            tools:layout="@layout/fragment_details"/>
 
 
     </LinearLayout>
