@@ -117,6 +117,7 @@ public class FragmentDetails extends Fragment {
         actionFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mMovie == null) return;
                 Drawable image;
 
                 if (mMovie.getIsFavorite() > 0) {
