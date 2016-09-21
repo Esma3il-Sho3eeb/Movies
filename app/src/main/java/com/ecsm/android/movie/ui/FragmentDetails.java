@@ -33,7 +33,10 @@ import com.ecsm.android.movie.data.ReviewsContainer;
 import com.ecsm.android.movie.data.Video;
 import com.ecsm.android.movie.data.VideoContainer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+
+import java.lang.reflect.Modifier;
 
 public class FragmentDetails extends Fragment {
     public static final String TAG = "details";
@@ -147,6 +150,8 @@ public class FragmentDetails extends Fragment {
 
     public void onReceive(Movie movie) {
         mMovie = movie;
+        if(mRegisterChanges==null)
+            mRegisterChanges= (RegisterChanges) getActivity();
         mRegisterChanges.onMovieChange(mMovie);
 
         //
@@ -154,7 +159,7 @@ public class FragmentDetails extends Fragment {
         if (sd == null)
             mMovie.setIsFavorite(0);
         else
-            mMovie.setIsFavorite(sd.getIsFavorite());
+            mMovie.setIsFavorite(1);
         //
         Picasso.with(getActivity())
                 .load(Url.Base.IMAGE + movie.getPosterPath() + Url.API_KEY)
@@ -206,7 +211,9 @@ public class FragmentDetails extends Fragment {
         request = new StringRequest(mMovie.getMovieTrailsUrl(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Gson g = new Gson();
+                Gson g =new GsonBuilder()
+                        .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                        .create();
                 VideoContainer videoContainer = g.fromJson(response, VideoContainer.class);
                 mTrailersAdapter.removeAll();
                 mTrailersAdapter.addAll(videoContainer.getVideos());
@@ -230,7 +237,9 @@ public class FragmentDetails extends Fragment {
             request = new StringRequest(mMovie.getMovieReviewsUrl(), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Gson g = new Gson();
+                    Gson g = new GsonBuilder()
+                            .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                            .create();
                     ReviewsContainer reviewsContainer = g.fromJson(response, ReviewsContainer.class);
                     currentPage = reviewsContainer.getPage();
                     pagesNumber = reviewsContainer.getTotalPages();
@@ -283,7 +292,9 @@ public class FragmentDetails extends Fragment {
         request = new StringRequest(mMovie.getMovieDetailsUrl(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Gson g = new Gson();
+                Gson g = new GsonBuilder()
+                        .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                        .create();
                 mMovie = g.fromJson(response, Movie.class);
                 String string198 = mMovie.getRuntime().toString().concat("min");
                 duration.setText(string198);

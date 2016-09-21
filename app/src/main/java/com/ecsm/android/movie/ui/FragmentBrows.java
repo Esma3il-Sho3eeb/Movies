@@ -26,6 +26,9 @@ import com.ecsm.android.movie.adapter.RecycleAdapter;
 import com.ecsm.android.movie.data.Data;
 import com.ecsm.android.movie.data.Movie;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.lang.reflect.Modifier;
 
 public class FragmentBrows extends Fragment {
     public static final String TAG = "brows";
@@ -174,8 +177,10 @@ public class FragmentBrows extends Fragment {
             request = new StringRequest(urlRequest, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Gson g = new Gson();
-                    final Data d = g.fromJson(response, Data.class);
+                    Gson g =new GsonBuilder()
+                            .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                            .create();
+                     Data d = g.fromJson(response, Data.class);
                     currentPage = d.getPage();
                     adapter.removeAll();
                     adapter.addAll(d.getMovies());
@@ -194,8 +199,10 @@ public class FragmentBrows extends Fragment {
             request = new StringRequest(urlRequest + "&page=" + (currentPage + 1), new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Gson g = new Gson();
-                    final Data d = g.fromJson(response, Data.class);
+                    Gson g =new GsonBuilder()
+                            .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                            .create();
+                     Data d = g.fromJson(response, Data.class);
                     currentPage = d.getPage();
                     adapter.addAll(d.getMovies());
                     recast = true;

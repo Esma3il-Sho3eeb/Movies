@@ -1,17 +1,22 @@
 package com.ecsm.android.movie.ui;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,6 +33,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class ActivityBrows extends AppCompatActivity implements FragmentBrows.CallBack, FragmentDetails.RegisterChanges {
+    private static final int MY_PERMISSIONS_REQUEST = 1111;
     private static boolean available = false, prefWifi = true;
     private static boolean refreshStatus = true;
     boolean favoriteOn = false;
@@ -65,6 +71,52 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         ///
 
 
+        addDrawer();
+//
+
+
+
+     checkThePermission();
+
+    }
+
+    private void checkThePermission() {
+
+        int hasInternetPermission = 5,hasNetworkPermission=5;
+
+            hasInternetPermission = ContextCompat.checkSelfPermission(this,Manifest.permission.INTERNET);
+            hasNetworkPermission= ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_NETWORK_STATE);
+            if ((hasInternetPermission != PackageManager.PERMISSION_GRANTED)
+                    ||(hasNetworkPermission != PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET,Manifest.permission.ACCESS_NETWORK_STATE},
+                        MY_PERMISSIONS_REQUEST);
+                return;
+            }
+
+
+        beginTheTransaction(true);
+    }
+
+    private void beginTheTransaction(boolean grantPermission) {
+
+        if (grantPermission) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_fragment_brows, new FragmentBrows())
+                    .commit();
+            mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
+
+            if (mFragmentDetails != null) {
+                if (lastMovie != null)
+                    mFragmentDetails.onReceive(lastMovie);
+            }
+        } else {
+            Toast.makeText(ActivityBrows.this, "permissionDenied", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addDrawer() {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem()
                 .withIdentifier(1).withName(R.string.action_brows).withSelectable(true);
 
@@ -110,6 +162,14 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
                         return true;
                     case 2:
                         //favorite
+                        Fragment temp=fm.findFragmentByTag(FragmentFavorite.TAG);
+                        if(temp!=null&&temp instanceof FragmentFavorite){
+                            transaction = fm.beginTransaction();
+                            transaction.replace(R.id.container_fragment_brows, temp);
+
+                            transaction.commit();
+                            return true;
+                        }
                         mFragmentFavorite = new FragmentFavorite();
 
                         transaction = fm.beginTransaction();
@@ -137,12 +197,6 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 
             }
         });
-
-        ///
-
-        mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
-
-
     }
 
 
@@ -158,6 +212,8 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         this.registerReceiver(mNetworkReceiver, filter);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+
+
     }
 
 
@@ -165,7 +221,7 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
     protected void onStart() {
         super.onStart();
         SharedPreferences sh = PreferenceManager.getDefaultSharedPreferences(this);
-        prefWifi = sh.getBoolean(getString(R.string.pref_key_over_wifi), true);
+        prefWifi = sh.getBoolean(getString(R.string.pref_key_over_wifi), false);
 
 
         if (refreshStatus)
@@ -179,16 +235,7 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
         super.onResume();
 
         setTitle(R.string.app_name);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container_fragment_brows, new FragmentBrows())
-                .commit();
-        mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
 
-        if (mFragmentDetails != null) {
-            if (lastMovie != null)
-                mFragmentDetails.onReceive(lastMovie);
-        }
 
     }
 
@@ -218,6 +265,30 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
             available = false;
         }
         refreshStatusTextView(available);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    checkThePermission();
+
+                } else {
+
+                    Toast.makeText(ActivityBrows.this, "sorry permission denied", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     private void refreshStatusTextView(boolean status) {
@@ -286,7 +357,9 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
             bundle.putSerializable(Movie.KEY_EXTRA, movie);
             mFragmentDetails.setArguments(bundle);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_fragment_brows, mFragmentDetails).addToBackStack(null).commit();
+                    .replace(R.id.container_fragment_brows, mFragmentDetails)
+                    .addToBackStack(FragmentDetails.TAG)
+                    .commit();
 
         }
 
