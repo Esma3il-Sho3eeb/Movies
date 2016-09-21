@@ -72,37 +72,51 @@ public class ActivityBrows extends AppCompatActivity implements FragmentBrows.Ca
 //
         mFragmentDetails = (FragmentDetails) getSupportFragmentManager().findFragmentById(R.id.container_fragment_details);
         if (savedInstanceState == null) {
-FragmentBrows fragmentBrows=new FragmentBrows();
+            FragmentBrows fragmentBrows = new FragmentBrows();
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_fragment_brows, fragmentBrows)
                     .commit();
-            lastFragment=fragmentBrows;
 
 
-        }else {
-            lastMovie= (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
-            lastFragment=getSupportFragmentManager().getFragment(savedInstanceState,LAS_FRAGMENT_KEY);
-            if(lastMovie!=null&&lastFragment!=null&&lastFragment instanceof FragmentDetails){
-                Bundle bundle=new Bundle();
-                bundle.putSerializable(Movie.KEY_EXTRA,lastMovie);
-                if(mFragmentDetails!=null)
-                {
-
-                    mFragmentDetails.setArguments(bundle);
-                }else {
+            lastFragment = fragmentBrows;
+        } else {
+            lastFragment = getSupportFragmentManager().getFragment(savedInstanceState, LAS_FRAGMENT_KEY);
+            lastMovie = (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
+            if (lastFragment != null) {
+                if (lastFragment instanceof FragmentDetails) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Movie.KEY_EXTRA, lastMovie);
+                    lastFragment = new FragmentDetails();
                     lastFragment.setArguments(bundle);
+                } else if (lastFragment instanceof FragmentFavorite) {
+                    lastFragment = new FragmentFavorite();
+                }
+
+            } else {
+                lastFragment = new FragmentBrows();
+            }
+            if (findViewById(R.id.container_fragment_details) != null) {
+                mFragmentDetails.onReceive(lastMovie);
+
+            }
+
+            if (findViewById(R.id.container_fragment_details) == null) {
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container_fragment_brows, lastFragment)
+                        .commit();
+            } else {
+                if ((lastFragment instanceof FragmentDetails)) {
+                    lastFragment = new FragmentBrows();
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.container_fragment_brows, lastFragment)
                             .commit();
                 }
-            }else if(lastFragment!=null){
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container_fragment_brows, lastFragment)
-                        .commit();
             }
+
         }
     }
 

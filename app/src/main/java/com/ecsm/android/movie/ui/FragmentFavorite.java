@@ -36,7 +36,7 @@ public class FragmentFavorite extends Fragment {
         mCallBack = (FragmentBrows.CallBack) getActivity();
 
 
-        if (savedInstanceState == null) {
+        ((ActivityBrows)getActivity()).lastFragment=this;
 
 
             ((ActivityBrows) getActivity()).setActivityTitle(getString(R.string.fragment_favorite_title));
@@ -56,7 +56,7 @@ public class FragmentFavorite extends Fragment {
 
             recyclerView.setAdapter(adapter);
             getData();
-        }
+
         //end coding
         return v;
     }
@@ -65,6 +65,7 @@ public class FragmentFavorite extends Fragment {
     public void onPause() {
         super.onPause();
         ((ActivityBrows) getActivity()).favoriteOn = false;
+        ((ActivityBrows)getActivity()).lastFragment=FragmentFavorite.this;
     }
 
     public void getData() {
@@ -76,8 +77,9 @@ public class FragmentFavorite extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getActivity().getSupportFragmentManager().putFragment(outState,
-                ActivityBrows.LAS_FRAGMENT_KEY, this);
+        ((ActivityBrows)getActivity()).lastFragment=this;
+
     }
+
 
 }

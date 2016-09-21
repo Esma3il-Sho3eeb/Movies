@@ -154,8 +154,11 @@ public class FragmentDetails extends Fragment {
 
     public void onReceive(Movie movie) {
         mMovie = movie;
-        if(mRegisterChanges==null)
-            mRegisterChanges= (RegisterChanges) getActivity();
+        if (mMovie == null) return;
+
+        if (mRegisterChanges == null)
+            mRegisterChanges = (RegisterChanges) getActivity();
+        if (mRegisterChanges != null)
         mRegisterChanges.onMovieChange(mMovie);
 
         //
@@ -166,7 +169,7 @@ public class FragmentDetails extends Fragment {
             mMovie.setIsFavorite(1);
         //
         Picasso.with(getActivity())
-                .load(Url.Base.IMAGE + movie.getPosterPath() + Url.API_KEY)
+                .load(Url.Base.IMAGE + mMovie.getPosterPath() + Url.API_KEY)
                 .into(posterImage);
 
         movieTitle.setText(movie.getTitle());
@@ -205,9 +208,7 @@ public class FragmentDetails extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-outState.putSerializable(Movie.KEY_EXTRA,mMovie);
-        getActivity().getSupportFragmentManager().putFragment(outState,
-                ActivityBrows.LAS_FRAGMENT_KEY, this);
+        ((ActivityBrows) getActivity()).lastFragment = this;
     }
 
     private void getMovieTrailers() {
@@ -216,7 +217,7 @@ outState.putSerializable(Movie.KEY_EXTRA,mMovie);
         request = new StringRequest(mMovie.getMovieTrailsUrl(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Gson g =new GsonBuilder()
+                Gson g = new GsonBuilder()
                         .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
                         .create();
                 VideoContainer videoContainer = g.fromJson(response, VideoContainer.class);
@@ -320,5 +321,11 @@ outState.putSerializable(Movie.KEY_EXTRA,mMovie);
         void onMovieChange(Movie movie);
 
         void onMovieStatusChange();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((ActivityBrows)getActivity()).lastFragment=this;
     }
 }

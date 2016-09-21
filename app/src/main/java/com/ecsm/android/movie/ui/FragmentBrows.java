@@ -111,7 +111,11 @@ public class FragmentBrows extends Fragment {
         editor.putString(getString(R.string.pref_key_sort_with), urlRequest);
         editor.apply();
     }
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ((ActivityBrows)getActivity()).lastFragment=this;
+    }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
