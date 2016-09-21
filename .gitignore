@@ -73,8 +73,9 @@ target/
 
 # Android Studio and Gradle specific entries
 .gradle
-.idea
+.idea/
 *.iml
 build
-/gradle.properties
 gradle.properties
+
+*.properties
