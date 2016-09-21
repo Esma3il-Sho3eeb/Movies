@@ -110,13 +110,7 @@ public class FragmentDetails extends Fragment {
         });
         trailersView.setAdapter(mTrailersAdapter);
 
-        if (getArguments() != null)
-            mMovie = (Movie) getArguments().getSerializable(Movie.KEY_EXTRA);
-        if (savedInstanceState != null) {
-            if (savedInstanceState.getSerializable(Movie.KEY_EXTRA) != null)
-                mMovie = (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
-        }
-        if (mMovie != null) onReceive(mMovie);
+
         actionFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,6 +139,16 @@ public class FragmentDetails extends Fragment {
                 mRegisterChanges.onMovieStatusChange();
             }
         });
+
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getSerializable(Movie.KEY_EXTRA) != null)
+                mMovie = (Movie) savedInstanceState.getSerializable(Movie.KEY_EXTRA);
+        }
+        if (getArguments() != null)
+            mMovie = (Movie) getArguments().getSerializable(Movie.KEY_EXTRA);
+        if (mMovie != null) onReceive(mMovie);
+
         return v;
     }
 
@@ -201,8 +205,9 @@ public class FragmentDetails extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        getActivity().getSupportFragmentManager().putFragment(outState, TAG, this);
+outState.putSerializable(Movie.KEY_EXTRA,mMovie);
+        getActivity().getSupportFragmentManager().putFragment(outState,
+                ActivityBrows.LAS_FRAGMENT_KEY, this);
     }
 
     private void getMovieTrailers() {

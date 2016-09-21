@@ -31,7 +31,7 @@ public class FragmentFavorite extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_brows, container, false);
 
-        ((ActivityBrows)getActivity()).favoriteOn=true;
+        ((ActivityBrows) getActivity()).favoriteOn = true;
         //start coding
         mCallBack = (FragmentBrows.CallBack) getActivity();
 
@@ -39,7 +39,7 @@ public class FragmentFavorite extends Fragment {
         if (savedInstanceState == null) {
 
 
-            ((ActivityBrows)getActivity()).setActivityTitle(getString(R.string.fragment_favorite_title));
+            ((ActivityBrows) getActivity()).setActivityTitle(getString(R.string.fragment_favorite_title));
 
 
             RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
@@ -64,7 +64,7 @@ public class FragmentFavorite extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        ((ActivityBrows)getActivity()).favoriteOn=false;
+        ((ActivityBrows) getActivity()).favoriteOn = false;
     }
 
     public void getData() {
@@ -73,5 +73,11 @@ public class FragmentFavorite extends Fragment {
         adapter.addAll(movies);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getActivity().getSupportFragmentManager().putFragment(outState,
+                ActivityBrows.LAS_FRAGMENT_KEY, this);
+    }
 
 }
